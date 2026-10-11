@@ -1,6 +1,6 @@
 import { useMutation, useQuery, type UseMutationOptions } from "@tanstack/react-query";
 import { http } from "../../../lib/http";
-import { LeaveType, LeaveBalance, LeaveApplication } from "./types";
+import type { LeaveType, LeaveBalance, LeaveApplication } from "./types";
 
 const KEY = "elm";
 
@@ -9,18 +9,6 @@ export const keys = {
   leaveBalances: () => [KEY, "balances"] as const,
   leaveApplications: () => [KEY, "applications"] as const,
 };
-
-function invalidateLeaveTypes(qc: ReturnType<typeof useQueryClient>) {
-  qc.invalidateQueries({ queryKey: keys.leaveTypes() });
-}
-
-function invalidateLeaveBalances(qc: ReturnType<typeof useQueryClient>) {
-  qc.invalidateQueries({ queryKey: keys.leaveBalances() });
-}
-
-function invalidateLeaveApplications(qc: ReturnType<typeof useQueryClient>) {
-  qc.invalidateQueries({ queryKey: keys.leaveApplications() });
-}
 
 export function useLeaveTypes() {
   return useQuery({
@@ -47,19 +35,15 @@ export function useLeaveApplications() {
 }
 
 export function useCreateLeaveApplication(options?: UseMutationOptions<LeaveApplication, unknown, LeaveApplication>) {
-  const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: LeaveApplication) => await http.post<LeaveApplication>("/elm/applications/create", body),
-    onSuccess: () => invalidateLeaveApplications(qc),
+    mutationFn: async (body: LeaveApplication) => (await http.post<LeaveApplication>("/elm/applications/create", body)).data,
     ...options,
   });
 }
 
 export function useWithdrawLeaveApplication(id: number, options?: UseMutationOptions<void, unknown, void>) {
-  const qc = useQueryClient();
   return useMutation({
-    mutationFn: async () => await http.post(`/elm/applications/${id}/withdraw`, {}),
-    onSuccess: () => invalidateLeaveApplications(qc),
+    mutationFn: async () => (await http.post(`/elm/applications/${id}/withdraw`, {})).data,
     ...options,
   });
 }
