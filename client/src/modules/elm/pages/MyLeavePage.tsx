@@ -59,7 +59,7 @@ export default function MyLeavePage() {
         <Stack spacing="md">
           <Text fw={600}>Leave Balances</Text>
           <DataTable<LeaveBalance>
-            rows={(balances?.results ?? []) as LeaveBalance[]}
+            rows={(balances ?? []) as LeaveBalance[]}
             loading={balancesPending}
             rowKey={(r) => r.employee_id}
             minWidth={400}
@@ -67,6 +67,11 @@ export default function MyLeavePage() {
               { key: "employee_id", header: "Employee ID" },
               { key: "balance", header: "Entitled Days" },
             ]}
+            empty={{
+              icon: FaUserCheck,
+              title: "No leave balances available",
+              description: "Your leave balances will appear here.",
+            }}
           />
         </Stack>
       </Card>
@@ -75,7 +80,7 @@ export default function MyLeavePage() {
         <Stack spacing="md">
           <Text fw={600}>Leave Applications</Text>
           <DataTable<LeaveApplication>
-            rows={(applications?.results ?? []) as LeaveApplication[]}
+            rows={(applications ?? []) as LeaveApplication[]}
             loading={applicationsPending}
             rowKey={(r) => r.id}
             minWidth={400}
@@ -89,6 +94,11 @@ export default function MyLeavePage() {
               { key: "status", header: "Status",
                 render: (r) => <StatusBadge status={r.status} /> },
             ]}
+            empty={{
+              icon: FaUserCheck,
+              title: "No leave applications available",
+              description: "Your leave applications will appear here.",
+            }}
           />
         </Stack>
       </Card>
@@ -97,7 +107,7 @@ export default function MyLeavePage() {
         <Stack spacing="md">
           <Text fw={600}>Apply for Leave</Text>
           <select value={leaveType?.code ?? ""} onChange={(e) => setLeaveType({ code: e.target.value } as LeaveType)}>
-            {balances?.results.map((balance) => (
+            {balances?.map((balance) => (
               <option key={balance.employee_id} value={balance.leave_type_code}>{balance.leave_type_code}</option>
             ))}
           </select>
