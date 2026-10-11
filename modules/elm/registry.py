@@ -1,4 +1,4 @@
-"""Permissions this module recognises. No nav: it has no screens of its own."""
+"""Permissions this module recognises."""
 
 PERMISSIONS = [
     ("elm.leave_type.view", "List Leave Types"),
@@ -17,3 +17,17 @@ ROLE_GRANTS = {
     "faculty": _STAFF,
     "staff": _STAFF,
 }
+
+MODULE = {
+    "code": "elm",
+    "label": "Employee Leave",
+    "icon": "CalendarCheck",
+    "base_path": "/elm",
+    "nav_section": "Leave",
+    "sort_order": 20,
+    "status": "active",
+}
+
+NAV_ITEMS = [
+    {"code": "elm.mine", "label": "My Leave", "icon": "CalendarCheck", "to": "/elm/mine", "required_permission": "elm.application.view", "sort_order": 10},
+]
