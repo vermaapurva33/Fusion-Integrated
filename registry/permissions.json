@@ -38,17 +38,17 @@
       "grants": {
         "faculty": [
           "elm.application.create",
-          "elm.application.list",
-          "elm.application.withdraw",
-          "elm.balance.list",
-          "elm.leave_type.list"
+          "elm.application.delete",
+          "elm.application.view",
+          "elm.balance.view",
+          "elm.leave_type.view"
         ],
         "staff": [
           "elm.application.create",
-          "elm.application.list",
-          "elm.application.withdraw",
-          "elm.balance.list",
-          "elm.leave_type.list"
+          "elm.application.delete",
+          "elm.application.view",
+          "elm.balance.view",
+          "elm.leave_type.view"
         ]
       },
       "module_grants": [
@@ -57,15 +57,15 @@
       ],
       "permissions": [
         {
-          "code": "elm.leave_type.list",
+          "code": "elm.leave_type.view",
           "label": "List Leave Types"
         },
         {
-          "code": "elm.balance.list",
+          "code": "elm.balance.view",
           "label": "List Leave Balances"
         },
         {
-          "code": "elm.application.list",
+          "code": "elm.application.view",
           "label": "List Leave Applications"
         },
         {
@@ -73,7 +73,7 @@
           "label": "Create Leave Application"
         },
         {
-          "code": "elm.application.withdraw",
+          "code": "elm.application.delete",
           "label": "Withdraw Leave Application"
         }
       ],

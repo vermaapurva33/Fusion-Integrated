@@ -8,7 +8,7 @@ from modules.elm.api.serializers import LeaveTypeSerializer, LeaveBalanceSeriali
 
 
 class LeaveTypeListView(APIView):
-    permission_classes = [HasPermission("elm.leave_type.list")]
+    permission_classes = [HasPermission("elm.leave_type.view")]
 
     def get(self, request):
         leave_types = LeaveType.objects.filter(is_active=True)
@@ -17,7 +17,7 @@ class LeaveTypeListView(APIView):
 
 
 class LeaveBalanceListView(APIView):
-    permission_classes = [HasPermission("elm.balance.list")]
+    permission_classes = [HasPermission("elm.balance.view")]
 
     def get(self, request):
         user_id = request.user.user_id
@@ -27,7 +27,7 @@ class LeaveBalanceListView(APIView):
 
 
 class LeaveApplicationListView(APIView):
-    permission_classes = [HasPermission("elm.application.list")]
+    permission_classes = [HasPermission("elm.application.view")]
 
     def get(self, request):
         user_id = request.user.user_id
@@ -52,7 +52,7 @@ class LeaveApplicationCreateView(APIView):
 
 
 class LeaveApplicationWithdrawView(APIView):
-    permission_classes = [HasPermission("elm.application.withdraw")]
+    permission_classes = [HasPermission("elm.application.delete")]
 
     def post(self, request, pk):
         user_id = request.user.user_id

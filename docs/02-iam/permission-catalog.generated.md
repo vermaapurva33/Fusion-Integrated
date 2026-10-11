@@ -17,11 +17,11 @@ For the intended taxonomy of modules not yet built, see
 
 | Code | What it allows | Held by |
 |---|---|---|
-| `elm.leave_type.list` | List Leave Types | `faculty`, `staff` |
-| `elm.balance.list` | List Leave Balances | `faculty`, `staff` |
-| `elm.application.list` | List Leave Applications | `faculty`, `staff` |
+| `elm.leave_type.view` | List Leave Types | `faculty`, `staff` |
+| `elm.balance.view` | List Leave Balances | `faculty`, `staff` |
+| `elm.application.view` | List Leave Applications | `faculty`, `staff` |
 | `elm.application.create` | Create Leave Application | `faculty`, `staff` |
-| `elm.application.withdraw` | Withdraw Leave Application | `faculty`, `staff` |
+| `elm.application.delete` | Withdraw Leave Application | `faculty`, `staff` |
 
 ## `placement_cell`
 
