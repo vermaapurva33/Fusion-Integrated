@@ -55,6 +55,24 @@
         "faculty",
         "staff"
       ],
+      "nav": {
+        "base_path": "/elm",
+        "icon": "CalendarCheck",
+        "items": [
+          {
+            "code": "elm.mine",
+            "icon": "CalendarCheck",
+            "label": "My Leave",
+            "required_permission": "elm.application.view",
+            "sort_order": 10,
+            "to": "/elm/mine"
+          }
+        ],
+        "label": "Employee Leave",
+        "nav_section": "Leave",
+        "sort_order": 20,
+        "status": "active"
+      },
       "permissions": [
         {
           "code": "elm.leave_type.view",
