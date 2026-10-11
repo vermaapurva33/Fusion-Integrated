@@ -1,9 +1,9 @@
 import { useState } from "react";
 import {
-  ActionIcon, Button, Card, Container, Group, Stack, Text,
+  Button, Card, Container, Stack, Text,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { FaHistory, FaUserCheck } from "react-icons/fa";
+import { FaUserCheck } from "react-icons/fa";
 
 import { errorMessage } from "../../../lib/http";
 import { DataTable } from "../../../ui/components/DataTable";
@@ -56,7 +56,7 @@ export default function MyLeavePage() {
         subtitle="Your leave balances and applications"
       />
       <Card padding="lg">
-        <Stack spacing="md">
+        <Stack gap="md">
           <Text fw={600}>Leave Balances</Text>
           <DataTable<LeaveBalance>
             rows={(balances ?? []) as LeaveBalance[]}
@@ -77,7 +77,7 @@ export default function MyLeavePage() {
       </Card>
 
       <Card padding="lg">
-        <Stack spacing="md">
+        <Stack gap="md">
           <Text fw={600}>Leave Applications</Text>
           <DataTable<LeaveApplication>
             rows={(applications ?? []) as LeaveApplication[]}
@@ -104,7 +104,7 @@ export default function MyLeavePage() {
       </Card>
 
       <Card padding="lg">
-        <Stack spacing="md">
+        <Stack gap="md">
           <Text fw={600}>Apply for Leave</Text>
           <select value={leaveType?.code ?? ""} onChange={(e) => setLeaveType({ code: e.target.value } as LeaveType)}>
             {balances?.map((balance) => (

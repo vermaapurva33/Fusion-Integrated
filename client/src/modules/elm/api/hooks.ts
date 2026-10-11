@@ -34,9 +34,9 @@ export function useLeaveApplications() {
   });
 }
 
-export function useCreateLeaveApplication(options?: UseMutationOptions<LeaveApplication, unknown, LeaveApplication>) {
+export function useCreateLeaveApplication(options?: UseMutationOptions<LeaveApplication, unknown, Partial<LeaveApplication>>) {
   return useMutation({
-    mutationFn: async (body: LeaveApplication) => (await http.post<LeaveApplication>("/elm/applications/create", body)).data,
+    mutationFn: async (body: Partial<LeaveApplication>) => (await http.post<LeaveApplication>("/elm/applications/create", body)).data,
     ...options,
   });
 }
