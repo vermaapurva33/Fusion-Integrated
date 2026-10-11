@@ -34,6 +34,52 @@
       "scope_permissions": [],
       "system_permissions": []
     },
+    "elm": {
+      "grants": {
+        "faculty": [
+          "elm.application.create",
+          "elm.application.list",
+          "elm.application.withdraw",
+          "elm.balance.list",
+          "elm.leave_type.list"
+        ],
+        "staff": [
+          "elm.application.create",
+          "elm.application.list",
+          "elm.application.withdraw",
+          "elm.balance.list",
+          "elm.leave_type.list"
+        ]
+      },
+      "module_grants": [
+        "faculty",
+        "staff"
+      ],
+      "permissions": [
+        {
+          "code": "elm.leave_type.list",
+          "label": "List Leave Types"
+        },
+        {
+          "code": "elm.balance.list",
+          "label": "List Leave Balances"
+        },
+        {
+          "code": "elm.application.list",
+          "label": "List Leave Applications"
+        },
+        {
+          "code": "elm.application.create",
+          "label": "Create Leave Application"
+        },
+        {
+          "code": "elm.application.withdraw",
+          "label": "Withdraw Leave Application"
+        }
+      ],
+      "scope_permissions": [],
+      "system_permissions": []
+    },
     "placement_cell": {
       "grants": {
         "Dean Academic": [
