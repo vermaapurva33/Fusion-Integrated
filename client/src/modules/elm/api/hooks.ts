@@ -1,5 +1,6 @@
 import { useMutation, useQuery, type UseMutationOptions } from "@tanstack/react-query";
 import { http } from "../../../lib/http";
+import { LeaveType, LeaveBalance, LeaveApplication } from "./types";
 
 const KEY = "elm";
 
@@ -45,10 +46,10 @@ export function useLeaveApplications() {
   });
 }
 
-export function useCreateLeaveApplication(options?: UseMutationOptions<void, unknown, LeaveApplication>) {
+export function useCreateLeaveApplication(options?: UseMutationOptions<LeaveApplication, unknown, LeaveApplication>) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (body: LeaveApplication) => await http.post("/elm/applications/create", body),
+    mutationFn: async (body: LeaveApplication) => await http.post<LeaveApplication>("/elm/applications/create", body),
     onSuccess: () => invalidateLeaveApplications(qc),
     ...options,
   });
