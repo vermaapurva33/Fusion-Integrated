@@ -2,9 +2,8 @@
 import pytest
 from rest_framework.test import APIClient
 
-from conftest import make_session
+from conftest import make_session, stub_iam, user_ref
 from modules.elm.models import LeaveType, LeaveApplication
-from modules.directory.models import UserRef
 
 
 pytestmark = pytest.mark.django_db
@@ -15,38 +14,10 @@ def leave_type():
     return LeaveType.objects.create(code="CL", name="Casual Leave")
 
 
-@pytest.fixture
-def user_ref(user_id=1001):
-    return UserRef.objects.create(
-        user_id=user_id, username=f"u{user_id}", display_name=f"User {user_id}", kind="faculty"
-    )
-
-
-@pytest.fixture
-def faculty_user(leave_type, user_ref):
-    return make_session(
-        user_id=1001,
-        permissions=("elm.application.create",),
-        modules=("elm",),
-        kind="faculty",
-        roles=("faculty",),
-        active_role="faculty",
-    )
-
-
-@pytest.fixture
-def non_faculty_user(leave_type, user_ref):
-    return make_session(
-        user_id=2002,
-        permissions=(),
-        modules=("elm",),
-        kind="student",
-        roles=("student",),
-        active_role="student",
-    )
-
-
-def test_create_leave_application(faculty_user, leave_type, user_ref):
+def test_create_leave_application(stub_iam, leave_type, user_ref):
+    session = make_session(user_id=1001, kind="faculty", modules=("elm",), permissions=("elm.application.create",))
+    stub_iam(session, users={1001: user_ref(1001)})
+    
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
 
@@ -61,11 +32,14 @@ def test_create_leave_application(faculty_user, leave_type, user_ref):
     response = c.post("/api/v1/elm/applications/create", data, format="json")
     assert response.status_code == 201
     created_application = LeaveApplication.objects.get(pk=response.json()["id"])
-    assert created_application.applicant_id == faculty_user.user_id
+    assert created_application.applicant_id == 1001
     assert created_application.status == "PENDING"
 
 
-def test_create_leave_application_without_permission(non_faculty_user, leave_type):
+def test_create_leave_application_without_permission(stub_iam, leave_type, user_ref):
+    session = make_session(user_id=2002, kind="student", modules=("elm",), permissions=())
+    stub_iam(session, users={2002: user_ref(2002)})
+    
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
 
@@ -81,7 +55,10 @@ def test_create_leave_application_without_permission(non_faculty_user, leave_typ
     assert response.status_code == 403
 
 
-def test_create_leave_application_with_invalid_status(faculty_user, leave_type):
+def test_create_leave_application_with_invalid_status(stub_iam, leave_type, user_ref):
+    session = make_session(user_id=1001, kind="faculty", modules=("elm",), permissions=("elm.application.create",))
+    stub_iam(session, users={1001: user_ref(1001)})
+    
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
 
@@ -97,15 +74,17 @@ def test_create_leave_application_with_invalid_status(faculty_user, leave_type):
     response = c.post("/api/v1/elm/applications/create", data, format="json")
     assert response.status_code == 201
     created_application = LeaveApplication.objects.get(pk=response.json()["id"])
-    assert created_application.applicant_id == faculty_user.user_id
+    assert created_application.applicant_id == 1001
     assert created_application.status == "PENDING"
 
 
-def test_view_leave_applications(faculty_user):
+def test_view_leave_applications(stub_iam, leave_type, user_ref):
+    session = make_session(user_id=1001, kind="faculty", modules=("elm",), permissions=("elm.application.view",))
+    stub_iam(session, users={1001: user_ref(1001)})
+    
     c = APIClient()
     c.credentials(HTTP_AUTHORIZATION="Token abc")
 
-    user_ref(user_id=1002)
     LeaveApplication.objects.create(
         applicant_id=1002,
         leave_type_id=LeaveType.objects.get(code="CL").id,
@@ -119,4 +98,4 @@ def test_view_leave_applications(faculty_user):
     assert response.status_code == 200
     applications = response.json()["results"]
     assert len(applications) == 1
-    assert applications[0]["applicant"] == faculty_user.user_id
+    assert applications[0]["applicant"] == 1001
