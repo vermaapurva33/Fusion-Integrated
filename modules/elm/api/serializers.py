@@ -19,3 +19,4 @@ class LeaveApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveApplication
         fields = "__all__"
+        read_only_fields = ["applicant", "status", "decided_at", "decided_by", "submitted_at"]
