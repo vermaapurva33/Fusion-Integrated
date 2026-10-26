@@ -37,6 +37,7 @@
     "elm": {
       "grants": {
         "faculty": [
+          "elm.application.approve",
           "elm.application.create",
           "elm.application.delete",
           "elm.application.view",
@@ -44,6 +45,7 @@
           "elm.leave_type.view"
         ],
         "staff": [
+          "elm.application.approve",
           "elm.application.create",
           "elm.application.delete",
           "elm.application.view",
@@ -93,6 +95,10 @@
         {
           "code": "elm.application.delete",
           "label": "Withdraw Leave Application"
+        },
+        {
+          "code": "elm.application.approve",
+          "label": "Approve or reject leave applications as Unit Head"
         }
       ],
       "scope_permissions": [],

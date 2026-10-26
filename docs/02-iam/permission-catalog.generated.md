@@ -22,6 +22,7 @@ For the intended taxonomy of modules not yet built, see
 | `elm.application.view` | List Leave Applications | `faculty`, `staff` |
 | `elm.application.create` | Create Leave Application | `faculty`, `staff` |
 | `elm.application.delete` | Withdraw Leave Application | `faculty`, `staff` |
+| `elm.application.approve` | Approve or reject leave applications as Unit Head | `faculty`, `staff` |
 
 ## `placement_cell`
 

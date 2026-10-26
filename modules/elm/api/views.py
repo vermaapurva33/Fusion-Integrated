@@ -1,11 +1,67 @@
+from django.utils import timezone
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.exceptions import NotFound, BadRequestError
 
+from core.api.exceptions import BadRequestError
 from fusion_auth.permissions import HasPermission
-from modules.elm.models import LeaveApplication
-from modules.elm.api.serializers import LeaveApplicationSerializer
-import django.utils.timezone  # Import django.utils.timezone
+from modules.elm.models import LeaveType, LeaveBalance, LeaveApplication
+from modules.elm.api.serializers import LeaveTypeSerializer, LeaveBalanceSerializer, LeaveApplicationSerializer
+
+
+class LeaveTypeListView(APIView):
+    permission_classes = [HasPermission("elm.leave_type.view")]
+
+    def get(self, request):
+        leave_types = LeaveType.objects.filter(is_active=True)
+        serializer = LeaveTypeSerializer(leave_types, many=True)
+        return Response(serializer.data)
+
+
+class LeaveBalanceListView(APIView):
+    permission_classes = [HasPermission("elm.balance.view")]
+
+    def get(self, request):
+        user_id = request.user.user_id
+        balances = LeaveBalance.objects.filter(employee_id=user_id)
+        serializer = LeaveBalanceSerializer(balances, many=True)
+        return Response(serializer.data)
+
+
+class LeaveApplicationListView(APIView):
+    permission_classes = [HasPermission("elm.application.view")]
+
+    def get(self, request):
+        user_id = request.user.user_id
+        applications = LeaveApplication.objects.filter(applicant_id=user_id)
+        serializer = LeaveApplicationSerializer(applications, many=True)
+        return Response(serializer.data)
+
+
+class LeaveApplicationCreateView(APIView):
+    permission_classes = [HasPermission("elm.application.create")]
+
+    def post(self, request):
+        user_id = request.user.user_id
+        serializer = LeaveApplicationSerializer(data=request.data, context={"applicant_id": user_id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(applicant_id=user_id, status="PENDING")
+        return Response(serializer.data, status=201)
+
+
+class LeaveApplicationWithdrawView(APIView):
+    permission_classes = [HasPermission("elm.application.delete")]
+
+    def post(self, request, pk):
+        user_id = request.user.user_id
+        try:
+            application = LeaveApplication.objects.get(pk=pk, applicant_id=user_id, status="PENDING")
+        except LeaveApplication.DoesNotExist:
+            raise BadRequestError("Application not found or not pending", code="application_not_found_or_pending")
+
+        application.status = "WITHDRAWN"
+        application.save()
+        return Response(LeaveApplicationSerializer(application).data)
 
 
 class LeaveApplicationDecideView(APIView):
@@ -29,7 +85,7 @@ class LeaveApplicationDecideView(APIView):
 
         application.status = "APPROVED" if decision == "approve" else "REJECTED"
         application.decided_by_id = user_id
-        application.decided_at = django.utils.timezone.now()  # Use the imported module
+        application.decided_at = timezone.now()  # Use the imported module
         application.save()
 
         return Response(LeaveApplicationSerializer(application).data)
