@@ -5,6 +5,7 @@ from rest_framework.exceptions import NotFound, BadRequestError
 from fusion_auth.permissions import HasPermission
 from modules.elm.models import LeaveApplication
 from modules.elm.api.serializers import LeaveApplicationSerializer
+import django.utils.timezone  # Import django.utils.timezone
 
 
 class LeaveApplicationDecideView(APIView):
@@ -28,7 +29,7 @@ class LeaveApplicationDecideView(APIView):
 
         application.status = "APPROVED" if decision == "approve" else "REJECTED"
         application.decided_by_id = user_id
-        application.decided_at = django.utils.timezone.now()
+        application.decided_at = django.utils.timezone.now()  # Use the imported module
         application.save()
 
         return Response(LeaveApplicationSerializer(application).data)
