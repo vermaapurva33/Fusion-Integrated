@@ -55,3 +55,17 @@ class LeaveApplication(TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.applicant} - {self.leave_type} - {self.status}"
+
+
+class UnitHeadAssignment(TimeStampedModel):
+    employee = models.OneToOneField(UserRef, on_delete=models.CASCADE, related_name="elm_unit_head_link")
+    unit_head = models.ForeignKey(UserRef, on_delete=models.PROTECT, related_name="elm_unit_members")
+
+    class Meta:
+        db_table = "elm_unit_head_assignment"
+        constraints = [
+            models.CheckConstraint(condition=~models.Q(employee=models.F("unit_head")), name="elm_unit_head_not_self")
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.employee} -> {self.unit_head}"
