@@ -101,3 +101,37 @@ def test_view_leave_applications(stub_iam, leave_type, user_ref):
     applications = response.json()
     assert len(applications) == 1
     assert applications[0]["applicant"] == 1001
+
+
+def _payload(start, end, **kw):
+    return {"leave_type": "CL", "start_date": start, "end_date": end,
+            "is_half_day": False, "reason": "Personal", **kw}
+
+
+def _post(stub_iam, uid, payload):
+    UserRef.objects.update_or_create(user_id=uid, defaults={
+        "username": f"u{uid}", "display_name": f"User {uid}", "kind": "faculty"})
+    stub_iam(make_session(user_id=uid, kind="faculty", modules=("elm",),
+                          permissions=("elm.application.create",)))
+    c = APIClient()
+    c.credentials(HTTP_AUTHORIZATION="Token abc")
+    return c.post("/api/v1/elm/applications/create", payload, format="json")
+
+
+def test_end_before_start_is_rejected(stub_iam, leave_type):
+    assert _post(stub_iam, 1001, _payload("2026-11-05", "2026-11-01")).status_code == 400
+
+
+def test_overlap_with_own_pending_is_rejected(stub_iam, leave_type):
+    assert _post(stub_iam, 1001, _payload("2026-11-02", "2026-11-04")).status_code == 201
+    assert _post(stub_iam, 1001, _payload("2026-11-04", "2026-11-06")).status_code == 400
+
+
+def test_adjacent_leave_is_allowed(stub_iam, leave_type):
+    assert _post(stub_iam, 1001, _payload("2026-11-02", "2026-11-04")).status_code == 201
+    assert _post(stub_iam, 1001, _payload("2026-11-05", "2026-11-06")).status_code == 201
+
+
+def test_another_users_overlap_is_allowed(stub_iam, leave_type):
+    assert _post(stub_iam, 1001, _payload("2026-11-02", "2026-11-04")).status_code == 201
+    assert _post(stub_iam, 1002, _payload("2026-11-02", "2026-11-04")).status_code == 201
