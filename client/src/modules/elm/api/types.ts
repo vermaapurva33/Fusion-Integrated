@@ -5,8 +5,8 @@ export interface LeaveType {
 }
 
 export interface LeaveBalance {
-  employee_id: number;
-  leave_type_code: string;
+  employee: number;
+  leave_type: string;
   year: number;
   entitled_days: string;
   used_days: string;
@@ -14,15 +14,15 @@ export interface LeaveBalance {
 
 export interface LeaveApplication {
   id: number;
-  applicant_id: number;
-  leave_type_code: string;
+  applicant: number;
+  leave_type: string;
   start_date: string;
   end_date: string;
   is_half_day: boolean;
   reason: string;
-  substitute_id: number | null;
+  substitute: number | null;
   status: "PENDING" | "APPROVED" | "REJECTED" | "WITHDRAWN" | "CANCELLED";
   submitted_at: string;
   decided_at: string | null;
-  decided_by_id: number | null;
+  decided_by: number | null;
 }

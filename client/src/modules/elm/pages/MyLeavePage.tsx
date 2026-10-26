@@ -36,7 +36,7 @@ export default function MyLeavePage() {
     }
 
     createApplicationMutation.mutate(
-      { applicant_id: 1, leave_type_code: leaveType.code, start_date: startDate.toISOString(), end_date: endDate.toISOString(), is_half_day: isHalfDay, reason },
+      { leave_type: leaveType.code, start_date: startDate.toLocaleDateString("en-CA"), end_date: endDate.toLocaleDateString("en-CA"), is_half_day: isHalfDay, reason },
       {
         onSuccess: () => notifications.show({
           color: "green", title: "Leave application submitted",
@@ -61,10 +61,10 @@ export default function MyLeavePage() {
           <DataTable<LeaveBalance>
             rows={(balances ?? []) as LeaveBalance[]}
             loading={balancesPending}
-            rowKey={(r) => r.employee_id}
+            rowKey={(r) => r.year}
             minWidth={400}
             columns={[
-              { key: "employee_id", header: "Employee ID" },
+              { key: "employee", header: "Employee ID" },
               { key: "balance", header: "Entitled Days" },
             ]}
             empty={{
@@ -86,7 +86,7 @@ export default function MyLeavePage() {
             minWidth={400}
             columns={[
               { key: "id", header: "ID" },
-              { key: "leave_type_code", header: "Leave Type" },
+              { key: "leave_type", header: "Leave Type" },
               { key: "start_date", header: "Start Date",
                 render: (r) => r.start_date ? new Date(r.start_date).toLocaleDateString() : "—" },
               { key: "end_date", header: "End Date",
@@ -108,11 +108,11 @@ export default function MyLeavePage() {
           <Text fw={600}>Apply for Leave</Text>
           <select value={leaveType?.code ?? ""} onChange={(e) => setLeaveType({ code: e.target.value } as LeaveType)}>
             {balances?.map((balance) => (
-              <option key={balance.employee_id} value={balance.leave_type_code}>{balance.leave_type_code}</option>
+              <option key={balance.leave_type} value={balance.leave_type}>{balance.leave_type}</option>
             ))}
           </select>
-          <input type="date" value={startDate?.toISOString().split('T')[0] ?? ""} onChange={(e) => setStartDate(new Date(e.target.value))} />
-          <input type="date" value={endDate?.toISOString().split('T')[0] ?? ""} onChange={(e) => setEndDate(new Date(e.target.value))} />
+          <input type="date" value={startDate?.toLocaleDateString("en-CA").split('T')[0] ?? ""} onChange={(e) => setStartDate(new Date(e.target.value))} />
+          <input type="date" value={endDate?.toLocaleDateString("en-CA").split('T')[0] ?? ""} onChange={(e) => setEndDate(new Date(e.target.value))} />
           <label>
             Half Day
             <input type="checkbox" checked={isHalfDay} onChange={(e) => setIsHalfDay(e.target.checked)} />
