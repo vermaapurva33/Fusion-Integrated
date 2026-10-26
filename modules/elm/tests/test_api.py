@@ -135,3 +135,76 @@ def test_adjacent_leave_is_allowed(stub_iam, leave_type):
 def test_another_users_overlap_is_allowed(stub_iam, leave_type):
     assert _post(stub_iam, 1001, _payload("2026-11-02", "2026-11-04")).status_code == 201
     assert _post(stub_iam, 1002, _payload("2026-11-02", "2026-11-04")).status_code == 201
+
+
+from modules.elm.models import UnitHeadAssignment
+
+
+def _setup_app(code="CL", status="PENDING"):
+    for uid in (1001, 2001, 3001):
+        UserRef.objects.update_or_create(user_id=uid, defaults={
+            "username": f"u{uid}", "display_name": f"User {uid}", "kind": "faculty"})
+    UnitHeadAssignment.objects.update_or_create(employee_id=1001, defaults={"unit_head_id": 2001})
+    LeaveType.objects.get_or_create(code=code, defaults={"name": code})
+    return LeaveApplication.objects.create(
+        applicant_id=1001, leave_type_id=code, start_date="2026-11-02",
+        end_date="2026-11-03", is_half_day=False, reason="x", status=status)
+
+
+def _decide(stub_iam, uid, pk, decision, perms=("elm.application.approve",)):
+    stub_iam(make_session(user_id=uid, kind="faculty", modules=("elm",), permissions=perms))
+    c = APIClient()
+    c.credentials(HTTP_AUTHORIZATION="Token abc")
+    return c.post(f"/api/v1/elm/applications/{pk}/decide", {"decision": decision}, format="json")
+
+
+def test_unit_head_approves_cl(stub_iam):
+    app = _setup_app()
+    assert _decide(stub_iam, 2001, app.pk, "approve").status_code == 200
+    app.refresh_from_db()
+    assert app.status == "APPROVED" and app.decided_by_id == 2001 and app.decided_at is not None
+
+
+def test_unit_head_rejects_cl(stub_iam):
+    app = _setup_app()
+    assert _decide(stub_iam, 2001, app.pk, "reject").status_code == 200
+    app.refresh_from_db()
+    assert app.status == "REJECTED"
+
+
+def test_user_who_is_not_the_unit_head_gets_404(stub_iam):
+    app = _setup_app()
+    assert _decide(stub_iam, 3001, app.pk, "approve").status_code == 404
+    app.refresh_from_db()
+    assert app.status == "PENDING"
+
+
+def test_applicant_cannot_decide_own_request(stub_iam):
+    app = _setup_app()
+    assert _decide(stub_iam, 1001, app.pk, "approve").status_code == 404
+    app.refresh_from_db()
+    assert app.status == "PENDING"
+
+
+def test_decision_requires_approve_permission(stub_iam):
+    app = _setup_app()
+    assert _decide(stub_iam, 2001, app.pk, "approve", perms=()).status_code == 403
+
+
+def test_non_pending_request_cannot_be_decided(stub_iam):
+    app = _setup_app(status="WITHDRAWN")
+    assert _decide(stub_iam, 2001, app.pk, "approve").status_code == 400
+    app.refresh_from_db()
+    assert app.status == "WITHDRAWN"
+
+
+def test_unit_head_cannot_finally_approve_higher_sanction_leave(stub_iam):
+    app = _setup_app(code="EL")
+    assert _decide(stub_iam, 2001, app.pk, "approve").status_code == 400
+    app.refresh_from_db()
+    assert app.status == "PENDING"
+
+
+def test_invalid_decision_value_is_rejected(stub_iam):
+    app = _setup_app()
+    assert _decide(stub_iam, 2001, app.pk, "maybe").status_code == 400
