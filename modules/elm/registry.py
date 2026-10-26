@@ -6,11 +6,12 @@ PERMISSIONS = [
     ("elm.application.view", "List Leave Applications"),
     ("elm.application.create", "Create Leave Application"),
     ("elm.application.delete", "Withdraw Leave Application"),
+    ("elm.application.approve", "Approve or reject leave applications as Unit Head"),  # Add the new permission
 ]
 
 SYSTEM_PERMISSIONS = []
 
-_STAFF = ["elm.leave_type.view", "elm.balance.view", "elm.application.view", "elm.application.create", "elm.application.delete"]
+_STAFF = ["elm.leave_type.view", "elm.balance.view", "elm.application.view", "elm.application.create", "elm.application.delete", "elm.application.approve"]  # Update the _STAFF list
 
 #: Keyed by the designation name as it exists in globals_designation.
 ROLE_GRANTS = {
