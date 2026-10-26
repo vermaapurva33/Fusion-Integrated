@@ -25,14 +25,13 @@ class LeaveApplicationSerializer(serializers.ModelSerializer):
         start_date = attrs.get("start_date")
         end_date = attrs.get("end_date")
         applicant_id = self.context["applicant_id"]
-        leave_type_code = attrs.get("leave_type")
 
         # Rule 1: end_date must not be before start_date
         if end_date < start_date:
             raise serializers.ValidationError({"end_date": "End date must not be before start date."})
 
         # Rule 2: The leave type must be active
-        leave_type = LeaveType.objects.get(code=leave_type_code)
+        leave_type = attrs["leave_type"]
         if not leave_type.is_active:
             raise serializers.ValidationError({"leave_type": "Leave type is not active."})
 
