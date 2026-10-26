@@ -1,3 +1,4 @@
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from django.utils import timezone
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
@@ -6,9 +7,10 @@ from rest_framework.views import APIView
 from core.api.exceptions import BadRequestError
 from fusion_auth.permissions import HasPermission
 from modules.elm.models import LeaveType, LeaveBalance, LeaveApplication
-from modules.elm.api.serializers import LeaveTypeSerializer, LeaveBalanceSerializer, LeaveApplicationSerializer
+from modules.elm.api.serializers import LeaveTypeSerializer, LeaveBalanceSerializer, LeaveApplicationSerializer, LeaveDecisionSerializer
 
 
+@extend_schema(responses=LeaveTypeSerializer(many=True))
 class LeaveTypeListView(APIView):
     permission_classes = [HasPermission("elm.leave_type.view")]
 
@@ -18,6 +20,7 @@ class LeaveTypeListView(APIView):
         return Response(serializer.data)
 
 
+@extend_schema(responses=LeaveBalanceSerializer(many=True))
 class LeaveBalanceListView(APIView):
     permission_classes = [HasPermission("elm.balance.view")]
 
@@ -28,6 +31,7 @@ class LeaveBalanceListView(APIView):
         return Response(serializer.data)
 
 
+@extend_schema(responses=LeaveApplicationSerializer(many=True))
 class LeaveApplicationListView(APIView):
     permission_classes = [HasPermission("elm.application.view")]
 
@@ -38,6 +42,7 @@ class LeaveApplicationListView(APIView):
         return Response(serializer.data)
 
 
+@extend_schema(request=LeaveApplicationSerializer, responses={201: LeaveApplicationSerializer})
 class LeaveApplicationCreateView(APIView):
     permission_classes = [HasPermission("elm.application.create")]
 
@@ -49,6 +54,7 @@ class LeaveApplicationCreateView(APIView):
         return Response(serializer.data, status=201)
 
 
+@extend_schema(request=None, parameters=[OpenApiParameter('pk', int, OpenApiParameter.PATH)], responses=LeaveApplicationSerializer)
 class LeaveApplicationWithdrawView(APIView):
     permission_classes = [HasPermission("elm.application.delete")]
 
@@ -64,6 +70,7 @@ class LeaveApplicationWithdrawView(APIView):
         return Response(LeaveApplicationSerializer(application).data)
 
 
+@extend_schema(request=LeaveDecisionSerializer, parameters=[OpenApiParameter('pk', int, OpenApiParameter.PATH)], responses=LeaveApplicationSerializer)
 class LeaveApplicationDecideView(APIView):
     permission_classes = [HasPermission("elm.application.approve")]
 

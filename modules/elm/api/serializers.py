@@ -46,3 +46,7 @@ class LeaveApplicationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"start_date": "Overlapping application found."})
 
         return attrs
+
+
+class LeaveDecisionSerializer(serializers.Serializer):
+    decision = serializers.ChoiceField(choices=["approve", "reject"])
