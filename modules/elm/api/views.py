@@ -41,11 +41,10 @@ class LeaveApplicationCreateView(APIView):
 
     def post(self, request):
         user_id = request.user.user_id
-        serializer = LeaveApplicationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(applicant_id=user_id, status="PENDING")
-            return Response(serializer.data, status=201)
-        raise BadRequestError("Invalid data", code="invalid_data")
+        serializer = LeaveApplicationSerializer(data=request.data, context={"applicant_id": user_id})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(applicant_id=user_id, status="PENDING")
+        return Response(serializer.data, status=201)
 
 
 class LeaveApplicationWithdrawView(APIView):
